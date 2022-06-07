@@ -18,8 +18,9 @@ const mysql = require('mysql')
 const myconn = require('express-myconnection')
 const dotenv = require('dotenv');
 dotenv.config({ path: './.env'});
+const port = process.env.PORT||9000;
 
-app.set('port',process.env.PORT||9000);
+
 
 console.log(process.env.DB_PORT)
 
@@ -53,6 +54,6 @@ app.get('/',(req,res)=>{
 })
 
 //Server Running ----------------------
-app.listen(app.get('port'),()=>{
+app.listen(port,()=>{
     console.log("server corriendo en puerto: ",app.get('port'));
 });
