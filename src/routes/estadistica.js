@@ -1,7 +1,8 @@
 const express = require('express');
 const routes = express.Router();
+const jwt = require("jsonwebtoken");
 
-routes.get('/getestadistica/',(req,res)=>{
+routes.get('/getestadistica/',verificaToken,(req,res)=>{
     //res.send('test de api')
     req.getConnection((err,conn)=>{
         if(err) return res.send(err)
@@ -9,12 +10,20 @@ routes.get('/getestadistica/',(req,res)=>{
         conn.query('SELECT * FROM vw_estadistica',(err,rows)=>{
             if(err) return res.send(err)
 
-            res.json(rows);
+            jwt.verify(req.token,'clavesecreta',(err,authData)=>{
+                if(err) return res.send("2")
+
+                res.json({
+                    mensaje:"Get creado",
+                    authData:authData,
+                    body:rows
+                })
+            })
         })
     })
 })
 
-routes.get('/getestadistica/:id',(req,res)=>{
+routes.get('/getestadistica/:id',verificaToken,(req,res)=>{
     //res.send('test de api')
     req.getConnection((err,conn)=>{
         if(err) return res.send(err)
@@ -22,12 +31,20 @@ routes.get('/getestadistica/:id',(req,res)=>{
         conn.query('select * from vw_estadistica where idusuarioroot = ?',[req.params.id],(err,rows)=>{
             if(err) return res.send(err)
 
-            res.json(rows);
+            jwt.verify(req.token,'clavesecreta',(err,authData)=>{
+                if(err) return res.send("2")
+
+                res.json({
+                    mensaje:"Get creado",
+                    authData:authData,
+                    body:rows
+                })
+            })
         })
     })
 })
 
-routes.get('/export/:id',(req,res)=>{
+routes.get('/export/:id',verificaToken,(req,res)=>{
     //res.send('test de api')
     req.getConnection((err,conn)=>{
         if(err) return res.send(err)
@@ -35,9 +52,27 @@ routes.get('/export/:id',(req,res)=>{
         conn.query('select * from vw_reporte where idusuarioroot = ?',[req.params.id],(err,rows)=>{
             if(err) return res.send(err)
 
-            res.json(rows);
+            jwt.verify(req.token,'clavesecreta',(err,authData)=>{
+                if(err) return res.send("2")
+
+                res.json({
+                    mensaje:"Get creado",
+                    authData:authData,
+                    body:rows
+                })
+            })
         })
     })
 })
+
+function verificaToken (req,res,next){
+    const bearerheader = req.headers['authorization'];
+
+    if(typeof bearerheader!=='undefined'){
+        const bearertoken = bearerheader.split(" ")[1];
+        req.token = bearertoken;
+        next();
+    }else return res.send("2")
+}
 
 module.exports = routes;

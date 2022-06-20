@@ -1,67 +1,108 @@
 const express = require('express');
 const routes = express.Router();
+const jwt = require("jsonwebtoken");
 
-routes.get('/get/',(req,res)=>{
+routes.get('/get/',verificaToken,(req,res)=>{
     req.getConnection((err,conn)=>{
         if(err) return res.send('2')
 
         conn.query('select * from rel_afiliados',(err,rows)=>{
             if(err) return res.send('2')
 
-            res.json(rows);
+            jwt.verify(req.token,'clavesecreta',(err,authData)=>{
+                if(err) return res.send("2")
+
+                res.json({
+                    mensaje:"Get creado",
+                    authData:authData,
+                    body:rows
+                })
+            })
         })
     })
 })
 
-routes.get('/get/:estado',(req,res)=>{
+routes.get('/get/:estado',verificaToken,(req,res)=>{
     req.getConnection((err,conn)=>{
         if(err) return res.send('2')
 
         conn.query('select * from rel_afiliados where estado = ?',[req.params.estado],(err,rows)=>{
             if(err) return res.send('2')
 
-            res.json(rows);
+            jwt.verify(req.token,'clavesecreta',(err,authData)=>{
+                if(err) return res.send("2")
+
+                res.json({
+                    mensaje:"Get creado",
+                    authData:authData,
+                    body:rows
+                })
+            })
         })
     })
 })
 
-routes.get('/getid/:idpersona-:idvigencia',(req,res)=>{
+routes.get('/getidraf/:idvigencia',verificaToken,(req,res)=>{
     req.getConnection((err,conn)=>{
         if(err) return res.send('2')
 
-        conn.query('select * from rel_afiliados where idpersona = ? and idanho_vigente = ?',[req.params.idpersona,req.params.idvigencia],(err,rows)=>{
+        conn.query('select * from rel_afiliados where idanho_vigente = ?',[req.params.idvigencia],(err,rows)=>{
             if(err) return res.send('2')
 
-            res.json(rows);
+            jwt.verify(req.token,'clavesecreta',(err,authData)=>{
+                if(err) return res.send("2")
+
+                res.json({
+                    mensaje:"Get creado",
+                    authData:authData,
+                    body:rows
+                })
+            })
         })
     })
 })
 
-routes.get('/getpersona/:id',(req,res)=>{
+routes.get('/getpersona/:id',verificaToken,(req,res)=>{
     req.getConnection((err,conn)=>{
         if(err) return res.send('2')
 
         conn.query('select * from vw_afiliados where idpersona = ?',[req.params.id],(err,rows)=>{
             if(err) return res.send('2')
 
-            res.json(rows);
+            jwt.verify(req.token,'clavesecreta',(err,authData)=>{
+                if(err) return res.send("2")
+
+                res.json({
+                    mensaje:"Get creado",
+                    authData:authData,
+                    body:rows
+                })
+            })
         })
     })
 })
 
-routes.get('/getusuario/:id',(req,res)=>{
+routes.get('/getusuario/:id',verificaToken,(req,res)=>{
     req.getConnection((err,conn)=>{
         if(err) return res.send('2')
 
         conn.query(`select * from vw_afiliados where estado = 'AC' and idusuario = ?`,[req.params.id],(err,rows)=>{
             if(err) return res.send('2')
 
-            res.json(rows);
+            jwt.verify(req.token,'clavesecreta',(err,authData)=>{
+                if(err) return res.send("2")
+
+                res.json({
+                    mensaje:"Get creado",
+                    authData:authData,
+                    body:rows
+                })
+            })
         })
     })
 })
 
-routes.post('/add/',(req,res)=>{
+routes.post('/add/',verificaToken,(req,res)=>{
     req.getConnection((err,conn)=>{
         if(err) return res.send(err)
         
@@ -72,7 +113,15 @@ routes.post('/add/',(req,res)=>{
                 conn.query('insert into rel_afiliados set ?',[req.body],(err,rows)=>{
                     if(err) return res.send(err)
         
-                  res.send('1')
+                    jwt.verify(req.token,'clavesecreta',(err,authData)=>{
+                        if(err) return res.send("2")
+        
+                        res.json({
+                            mensaje:"Get creado",
+                            authData:authData,
+                            body:"1"
+                        })
+                    })
                 })
 				
             }else return res.send("2")
@@ -81,7 +130,7 @@ routes.post('/add/',(req,res)=>{
     })
 })
 
-routes.delete('/del/:idpersona-:idanho_vigente',(req,res)=>{
+routes.delete('/del/:idpersona-:idanho_vigente',verificaToken,(req,res)=>{
     req.getConnection((err,conn)=>{
         if(err) return res.send(err)
         
@@ -89,10 +138,18 @@ routes.delete('/del/:idpersona-:idanho_vigente',(req,res)=>{
             if(err) return res.send("2")
 
             if (rows.length>0){
-                conn.query(`update rel_afiliados set estado=concat('I',now()) where idpersona= ? and idanho_vigente = ? `,[req.params.idpersona,req.params.idanho_vigente],(err,rows)=>{
+                conn.query(`update rel_afiliados set estado=concat('I',now()) where idpersona= ? and idanho_vigente = ? and estado = 'AC'`,[req.params.idpersona,req.params.idanho_vigente],(err,rows)=>{
                     if(err) return res.send(err)
         
-                  res.send('1')
+                    jwt.verify(req.token,'clavesecreta',(err,authData)=>{
+                        if(err) return res.send("2")
+        
+                        res.json({
+                            mensaje:"Get creado",
+                            authData:authData,
+                            body:"1"
+                        })
+                    })
                 })
 				
             }else return res.send("2")
@@ -107,7 +164,7 @@ routes.delete('/del/:idpersona-:idanho_vigente',(req,res)=>{
     })
 })
 
-routes.put('/upd/:idpersona-:idanho_vigente',(req,res)=>{
+routes.put('/upd/:idpersona-:idanho_vigente',verificaToken,(req,res)=>{
     req.getConnection((err,conn)=>{
         if(err) return res.send(err)
         
@@ -116,10 +173,18 @@ routes.put('/upd/:idpersona-:idanho_vigente',(req,res)=>{
 
             if (rows.length>0){
                 //verificar todos mandar todos los parametros necesaeios para la actualizacion 
-                conn.query('update rel_afiliados set ? where idpersona = ? and idanho_vigente',[req.body,req.params.idpersona,req.params.idanho_vigente],(err,rows)=>{
+                conn.query('update rel_afiliados set ? where idpersona = ? and idanho_vigente = ?',[req.body,req.params.idpersona,req.params.idanho_vigente],(err,rows)=>{
                     if(err) return res.send(err)
         
-                  res.send('1')
+                    jwt.verify(req.token,'clavesecreta',(err,authData)=>{
+                        if(err) return res.send("2")
+        
+                        res.json({
+                            mensaje:"Get creado",
+                            authData:authData,
+                            body:"1"
+                        })
+                    })
                 })
             }else return res.send("2")
         })
@@ -141,5 +206,15 @@ routes.post('/',(req,res)=>{
         })
     })
 })*/
+
+function verificaToken (req,res,next){
+    const bearerheader = req.headers['authorization'];
+
+    if(typeof bearerheader!=='undefined'){
+        const bearertoken = bearerheader.split(" ")[1];
+        req.token = bearertoken;
+        next();
+    }else return res.send("2")
+}
 
 module.exports = routes;

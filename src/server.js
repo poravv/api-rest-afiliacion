@@ -7,8 +7,6 @@ const configrutas =  require('./config_rutas')
 dotenv.config({ path: './.env'});
 const port = process.env.PORT||9000;
 
-
-
 const dbOptions = {
     host:process.env.DB_HOST,
     port:process.env.DB_PORT,
@@ -18,7 +16,8 @@ const dbOptions = {
     insecureAuth : true
 }
 
-//Middleware---------------------------
+//Middelware---
+app.use(express.urlencoded({extended : false}))
 app.use(express.json())
 app.use(myconn(mysql,dbOptions,'single'))
 app.use(configrutas)

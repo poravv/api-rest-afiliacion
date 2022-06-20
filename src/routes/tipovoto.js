@@ -1,7 +1,7 @@
 const express = require('express');
 const routes = express.Router();
 
-routes.get('/',(req,res)=>{
+routes.get('/get/',(req,res)=>{
     //res.send('test de api')
     req.getConnection((err,conn)=>{
         if(err) return res.send(err)
@@ -14,7 +14,7 @@ routes.get('/',(req,res)=>{
     })
 })
 
-routes.get('/:id',(req,res)=>{
+routes.get('/get/:id',(req,res)=>{
     //res.send('test de api')
     req.getConnection((err,conn)=>{
         if(err) return res.send(err)
@@ -27,7 +27,7 @@ routes.get('/:id',(req,res)=>{
     })
 })
 
-routes.post('/',(req,res)=>{
+routes.post('/add/',(req,res)=>{
     //res.send('test de api')
     req.getConnection((err,conn)=>{
         if(err) return res.send(err)
@@ -41,7 +41,7 @@ routes.post('/',(req,res)=>{
     })
 })
 
-routes.delete('/:id',(req,res)=>{
+routes.delete('/del/:id',(req,res)=>{
     //res.send('test de api')
     req.getConnection((err,conn)=>{
         if(err) return res.send(err)
@@ -55,7 +55,7 @@ routes.delete('/:id',(req,res)=>{
     })
 })
 
-routes.put('/:id',(req,res)=>{
+routes.put('/upd/:id',(req,res)=>{
     //res.send('test de api')
     req.getConnection((err,conn)=>{
         if(err) return res.send(err)

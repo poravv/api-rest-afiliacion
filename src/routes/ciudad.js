@@ -1,44 +1,69 @@
 const express = require('express');
 const routes = express.Router();
+const jwt = require("jsonwebtoken");
 
-routes.get('/get/', (req, res) => {
-    req.getConnection((err, conn) => {
-        if (err) return res.send(err)
+routes.get('/get/',verificaToken,(req,res)=>{
+    req.getConnection((err,conn)=>{
+        if(err) return res.send('2')
 
-        conn.query('select * from ciudad order by descripcion asc', (err, rows) => {
-            if (err) return res.send(err)
+        conn.query('select * from ciudad order by descripcion asc',(err,rows)=>{
+            if(err) return res.send('2')
 
-            res.json(rows);
+            jwt.verify(req.token,'clavesecreta',(err,authData)=>{
+                if(err) return res.send("2")
+
+                res.json({
+                    mensaje:"Get creado",
+                    authData:authData,
+                    body:rows
+                })
+            })
         })
     })
 })
 
-routes.get('/get/:estado', (req, res) => {
-    req.getConnection((err, conn) => {
-        if (err) return res.send(err)
+routes.get('/get/:estado',verificaToken, (req, res) => {
+    req.getConnection((err,conn)=>{
+        if(err) return res.send('2')
 
-        conn.query('select * from ciudad where estado = ? order by descripcion asc', [req.params.estado], (err, rows) => {
-            if (err) return res.send(err)
+        conn.query('select * from ciudad where estado = ? order by descripcion asc',[req.params.estado],(err,rows)=>{
+            if(err) return res.send('2')
 
-            res.json(rows);
+            jwt.verify(req.token,'clavesecreta',(err,authData)=>{
+                if(err) return res.send("2")
+
+                res.json({
+                    mensaje:"Get creado",
+                    authData:authData,
+                    body:rows
+                })
+            })
         })
     })
 })
 
-routes.get('/getid/:id', (req, res) => {
+routes.get('/getid/:id',verificaToken, (req, res) => {
     req.getConnection((err, conn) => {
         if (err) return res.send(err)
 
         conn.query('select * from ciudad where idciudad = ?', [req.params.id], (err, rows) => {
             if (err) return res.send(err)
 
-            res.json(rows);
+            jwt.verify(req.token,'clavesecreta',(err,authData)=>{
+                if(err) return res.send("2")
+
+                res.json({
+                    mensaje:"Get creado",
+                    authData:authData,
+                    body:rows
+                })
+            })
         })
     })
 })
 
 
-routes.post('/add/', (req, res) => {
+routes.post('/add/',verificaToken, (req, res) => {
     req.getConnection((err, conn) => {
         if (err) return res.send('2')
 
@@ -49,7 +74,15 @@ routes.post('/add/', (req, res) => {
                 conn.query('insert into ciudad set ?', [req.body], (err, rows) => {
                     if (err) return res.send('2')
 
-                    res.send('1')
+                    jwt.verify(req.token,'clavesecreta',(err,authData)=>{
+                        if(err) return res.send("2")
+        
+                        res.json({
+                            mensaje:"post creado",
+                            authData:authData,
+                            body:"1"
+                        })
+                    })
                 })
 
             } else return res.send("2")
@@ -58,7 +91,7 @@ routes.post('/add/', (req, res) => {
     })
 })
 
-routes.delete('/del/:id', (req, res) => {
+routes.delete('/del/:id',verificaToken, (req, res) => {
     req.getConnection((err, conn) => {
         if (err) return res.send('2')
 
@@ -69,7 +102,15 @@ routes.delete('/del/:id', (req, res) => {
                 conn.query(`update ciudad set estado='IN' where idciudad = ?`, [req.params.id], (err, rows) => {
                     if (err) return res.send('2')
 
-                    res.send('1')
+                    jwt.verify(req.token,'clavesecreta',(err,authData)=>{
+                        if(err) return res.send("2")
+        
+                        res.json({
+                            mensaje:"Get creado",
+                            authData:authData,
+                            body:"1"
+                        })
+                    })
                 })
 
             } else return res.send("2")
@@ -92,7 +133,7 @@ routes.delete('/del/:id', (req, res) => {
     })
 })*/
 
-routes.put('upd/:id', (req, res) => {
+routes.put('/upd/:id', verificaToken, (req, res) => {
     req.getConnection((err, conn) => {
         if (err) return res.send('2')
 
@@ -103,7 +144,15 @@ routes.put('upd/:id', (req, res) => {
                 conn.query('update ciudad set ? where idciudad = ?', [req.body, req.params.id], (err, rows) => {
                     if (err) return res.send('2')
 
-                    res.send('1')
+                    jwt.verify(req.token,'clavesecreta',(err,authData)=>{
+                        if(err) return res.send("2")
+        
+                        res.json({
+                            mensaje:"put creado",
+                            authData:authData,
+                            body:"1"
+                        })
+                    })
                 })
 
             } else return res.send("2")
@@ -126,5 +175,16 @@ routes.put('upd/:id', (req, res) => {
         })
     })
 })*/
+
+//Authorization: Bearer <token>
+function verificaToken (req,res,next){
+    const bearerheader = req.headers['authorization'];
+
+    if(typeof bearerheader!=='undefined'){
+        const bearertoken = bearerheader.split(" ")[1];
+        req.token = bearertoken;
+        next();
+    }else return res.send("2")
+}
 
 module.exports = routes;

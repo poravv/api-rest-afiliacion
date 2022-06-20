@@ -1,56 +1,89 @@
 const express = require('express');
 const routes = express.Router();
+const jwt = require("jsonwebtoken");
 
-routes.get('/get/',(req,res)=>{
+routes.get('/get/',verificaToken,(req,res)=>{
     req.getConnection((err,conn)=>{
         if(err) return res.send('2')
 
-        conn.query('select * from padron order by afiliacion asc',(err,rows)=>{
+        conn.query('select * from padron limit 100',(err,rows)=>{
             if(err) return res.send('2')
 
-            res.json(rows);
+            jwt.verify(req.token,'clavesecreta',(err,authData)=>{
+                if(err) return res.send("2")
+
+                res.json({
+                    mensaje:"Get creado",
+                    authData:authData,
+                    body:rows
+                })
+            })
         })
     })
 })
 
-routes.get('/get/:estado',(req,res)=>{
+routes.get('/get/:estado',verificaToken,(req,res)=>{
     req.getConnection((err,conn)=>{
         if(err) return res.send('2')
 
         conn.query('select * from padron where estado = ? order by afiliacion asc',[req.params.estado],(err,rows)=>{
             if(err) return res.send('2')
 
-            res.json(rows);
+            jwt.verify(req.token,'clavesecreta',(err,authData)=>{
+                if(err) return res.send("2")
+
+                res.json({
+                    mensaje:"Get creado",
+                    authData:authData,
+                    body:rows
+                })
+            })
         })
     })
 })
 
-routes.get('/getid/:id',(req,res)=>{
+routes.get('/getid/:id',verificaToken,(req,res)=>{
     req.getConnection((err,conn)=>{
         if(err) return res.send('2')
 
         conn.query('select * from padron where idpadron = ? order by afiliacion asc',[req.params.id],(err,rows)=>{
             if(err) return res.send('2')
 
-            res.json(rows);
+            jwt.verify(req.token,'clavesecreta',(err,authData)=>{
+                if(err) return res.send("2")
+
+                res.json({
+                    mensaje:"Get creado",
+                    authData:authData,
+                    body:rows
+                })
+            })
         })
     })
 })
 
-routes.get('/getidpersona/:id',(req,res)=>{
+routes.get('/getidpersona/:id',verificaToken,(req,res)=>{
     req.getConnection((err,conn)=>{
         if(err) return res.send('2')
 
         conn.query('select * from padron where idpersona = ? order by afiliacion asc',[req.params.id],(err,rows)=>{
             if(err) return res.send('2')
 
-            res.json(rows);
+            jwt.verify(req.token,'clavesecreta',(err,authData)=>{
+                if(err) return res.send("2")
+
+                res.json({
+                    mensaje:"Get creado",
+                    authData:authData,
+                    body:rows
+                })
+            })
         })
     })
 })
 
 
-routes.post('/add/',(req,res)=>{
+routes.post('/add/',verificaToken,(req,res)=>{
     req.getConnection((err,conn)=>{
         if(err) return res.send('2')
         
@@ -61,7 +94,15 @@ routes.post('/add/',(req,res)=>{
                 conn.query('insert into padron set ?',[req.body],(err,rows)=>{
                     if(err) return res.send('1')
         
-                  res.send('1')
+                    jwt.verify(req.token,'clavesecreta',(err,authData)=>{
+                        if(err) return res.send("2")
+        
+                        res.json({
+                            mensaje:"Get creado",
+                            authData:authData,
+                            body:"1"
+                        })
+                    })
                 })
 				
             }else return res.send("2")
@@ -70,7 +111,7 @@ routes.post('/add/',(req,res)=>{
     })
 })
 
-routes.delete('/del/:id',(req,res)=>{
+routes.delete('/del/:id',verificaToken,(req,res)=>{
     req.getConnection((err,conn)=>{
         if(err) return res.send('2')
         
@@ -80,7 +121,16 @@ routes.delete('/del/:id',(req,res)=>{
             if (rows.length>0){
                 conn.query(`update padron set estado = 'IN' where idpadron= ?`,[req.params.id],(err,rows)=>{
                     if(err) return res.send('2')
-                  res.send('1')
+
+                  jwt.verify(req.token,'clavesecreta',(err,authData)=>{
+                if(err) return res.send("2")
+
+                res.json({
+                    mensaje:"Get creado",
+                    authData:authData,
+                    body:"1"
+                })
+            })
                 })
                 /*conn.query('delete from padron where idpadron = ?',[req.params.id],(err,rows)=>{
                     if(err) return res.send('2')
@@ -91,7 +141,7 @@ routes.delete('/del/:id',(req,res)=>{
     })
 })
 
-routes.put('/upd/:id',(req,res)=>{
+routes.put('/upd/:id',verificaToken,(req,res)=>{
     req.getConnection((err,conn)=>{
         if(err) return res.send(err)
         
@@ -102,7 +152,15 @@ routes.put('/upd/:id',(req,res)=>{
                 conn.query('update padron set ? where idpadron = ?',[req.body,req.params.id],(err,rows)=>{
                     if(err) return res.send(err)
         
-                  res.send('1')
+                    jwt.verify(req.token,'clavesecreta',(err,authData)=>{
+                        if(err) return res.send("2")
+        
+                        res.json({
+                            mensaje:"Get creado",
+                            authData:authData,
+                            body:"1"
+                        })
+                    })
                 })
 				
             }else return res.send("2")
@@ -127,5 +185,15 @@ routes.post('/',(req,res)=>{
     })
 })
 */
+
+function verificaToken (req,res,next){
+    const bearerheader = req.headers['authorization'];
+
+    if(typeof bearerheader!=='undefined'){
+        const bearertoken = bearerheader.split(" ")[1];
+        req.token = bearertoken;
+        next();
+    }else return res.send("2")
+}
 
 module.exports = routes;

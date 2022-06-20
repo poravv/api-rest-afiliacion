@@ -1,43 +1,68 @@
 const express = require('express');
 const routes = express.Router();
+const jwt = require("jsonwebtoken");
 
-routes.get('/get/',(req,res)=>{
+routes.get('/get/',verificaToken,(req,res)=>{
     req.getConnection((err,conn)=>{
         if(err) return res.send('2')
 
         conn.query('select * from persona limit 100',(err,rows)=>{
             if(err) return res.send('2')
 
-            res.json(rows);
+            jwt.verify(req.token,'clavesecreta',(err,authData)=>{
+                if(err) return res.send("2")
+
+                res.json({
+                    mensaje:"Get creado",
+                    authData:authData,
+                    body:rows
+                })
+            })
         })
     })
 })
 
-routes.get('/get/:estado',(req,res)=>{
+routes.get('/get/:estado',verificaToken,(req,res)=>{
     req.getConnection((err,conn)=>{
         if(err) return res.send('2')
 
         conn.query('select * from persona where estado = ? limit 100',[req.params.estado],(err,rows)=>{
             if(err) return res.send('2')
 
-            res.json(rows);
+            jwt.verify(req.token,'clavesecreta',(err,authData)=>{
+                if(err) return res.send("2")
+
+                res.json({
+                    mensaje:"Get creado",
+                    authData:authData,
+                    body:rows
+                })
+            })
         })
     })
 })
 
-routes.get('/getid/:id',(req,res)=>{
+routes.get('/getid/:id',verificaToken,(req,res)=>{
     req.getConnection((err,conn)=>{
         if(err) return res.send('2')
 
         conn.query('select * from persona where idpersona = ? ',[req.params.id],(err,rows)=>{
             if(err) return res.send('2')
 
-            res.json(rows);
+            jwt.verify(req.token,'clavesecreta',(err,authData)=>{
+                if(err) return res.send("2")
+
+                res.json({
+                    mensaje:"Get creado",
+                    authData:authData,
+                    body:rows
+                })
+            })
         })
     })
 })
 
-routes.delete('/getdoc/:documento',(req,res)=>{
+routes.get('/getdoc/:documento',verificaToken,(req,res)=>{
     
     req.getConnection((err,conn)=>{
         if(err) return res.send('2')
@@ -45,13 +70,21 @@ routes.delete('/getdoc/:documento',(req,res)=>{
         conn.query('select * from persona where documento = ?',[req.params.documento],(err,rows)=>{
             if(err) return res.send('2')
 
-          res.send('1')
+            jwt.verify(req.token,'clavesecreta',(err,authData)=>{
+                if(err) return res.send("2")
+
+                res.json({
+                    mensaje:"Get creado",
+                    authData:authData,
+                    body:rows
+                })
+            })
         })
         
     })
 })
 
-routes.post('/add/',(req,res)=>{
+routes.post('/add/',verificaToken,(req,res)=>{
     req.getConnection((err,conn)=>{
         if(err) return res.send(err)
         
@@ -62,7 +95,15 @@ routes.post('/add/',(req,res)=>{
                 conn.query('insert into persona set ?',[req.body],(err,rows)=>{
                     if(err) return res.send(err)
         
-                  res.send('1')
+                    jwt.verify(req.token,'clavesecreta',(err,authData)=>{
+                        if(err) return res.send("2")
+        
+                        res.json({
+                            mensaje:"Get creado",
+                            authData:authData,
+                            body:"1"
+                        })
+                    })
                 })
             }else return res.send("2")
         })
@@ -70,7 +111,7 @@ routes.post('/add/',(req,res)=>{
     })
 })
 
-routes.delete('/del/:id',(req,res)=>{
+routes.delete('/del/:id',verificaToken,(req,res)=>{
     
     req.getConnection((err,conn)=>{
         if(err) return res.send('1')
@@ -82,7 +123,15 @@ routes.delete('/del/:id',(req,res)=>{
                 conn.query(`update persona set estado='AC' where idpersona = ?`,[req.params.id],(err,rows)=>{
                     if(err) return res.send('1')
         
-                  res.send('Registro Eliminado')
+                    jwt.verify(req.token,'clavesecreta',(err,authData)=>{
+                        if(err) return res.send("2")
+        
+                        res.json({
+                            mensaje:"Get creado",
+                            authData:authData,
+                            body:"1"
+                        })
+                    })
                 })
 				
             }else return res.send("2")
@@ -98,7 +147,7 @@ routes.delete('/del/:id',(req,res)=>{
 })
 
 
-routes.put('/upd/:id',(req,res)=>{
+routes.put('/upd/:id',verificaToken,(req,res)=>{
     req.getConnection((err,conn)=>{
         if(err) return res.send('2')
         
@@ -109,7 +158,15 @@ routes.put('/upd/:id',(req,res)=>{
                 conn.query('update persona set ? where idpersona = ?',[req.body,req.params.id],(err,rows)=>{
                     if(err) return res.send('2')
         
-                  res.send('1')
+                    jwt.verify(req.token,'clavesecreta',(err,authData)=>{
+                        if(err) return res.send("2")
+        
+                        res.json({
+                            mensaje:"Get creado",
+                            authData:authData,
+                            body:"1"
+                        })
+                    })
                 })
 				
             }else return res.send("2")
@@ -117,6 +174,7 @@ routes.put('/upd/:id',(req,res)=>{
         
     })
 })
+
 
 //MODELO PARA PROCEDIMIENTO
 /*routes.post('/',(req,res)=>{
@@ -132,5 +190,15 @@ routes.put('/upd/:id',(req,res)=>{
         })
     })
 })*/
+
+function verificaToken (req,res,next){
+    const bearerheader = req.headers['authorization'];
+
+    if(typeof bearerheader!=='undefined'){
+        const bearertoken = bearerheader.split(" ")[1];
+        req.token = bearertoken;
+        next();
+    }else return res.send("2")
+}
 
 module.exports = routes;
