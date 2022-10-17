@@ -5,7 +5,7 @@ const myconn = require('express-myconnection')
 const dotenv = require('dotenv');
 const configrutas =  require('./config_rutas')
 dotenv.config({ path: './.env'});
-const port = process.env.PORT||9000;
+const port = process.env.PORT||4001;
 
 const dbOptions = {
     host:process.env.DB_HOST,
