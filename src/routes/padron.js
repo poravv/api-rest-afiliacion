@@ -1,6 +1,8 @@
 const express = require('express');
 const routes = express.Router();
 const jwt = require("jsonwebtoken");
+const dotenv = require('dotenv');
+dotenv.config({ path: '../.env'});
 
 routes.get('/get/',verificaToken,(req,res)=>{
     req.getConnection((err,conn)=>{
@@ -9,7 +11,7 @@ routes.get('/get/',verificaToken,(req,res)=>{
         conn.query('select * from padron limit 100',(err,rows)=>{
             if(err) return res.send('2')
 
-            jwt.verify(req.token,'clavesecreta',(err,authData)=>{
+            jwt.verify(req.token,process.env.CLAVE_TOKEN,(err,authData)=>{
                 if(err) return res.send("2")
 
                 res.json({
@@ -29,7 +31,7 @@ routes.get('/get/:estado',verificaToken,(req,res)=>{
         conn.query('select * from padron where estado = ? order by afiliacion asc',[req.params.estado],(err,rows)=>{
             if(err) return res.send('2')
 
-            jwt.verify(req.token,'clavesecreta',(err,authData)=>{
+            jwt.verify(req.token,process.env.CLAVE_TOKEN,(err,authData)=>{
                 if(err) return res.send("2")
 
                 res.json({
@@ -49,7 +51,7 @@ routes.get('/getid/:id',verificaToken,(req,res)=>{
         conn.query('select * from padron where idpadron = ? order by afiliacion asc',[req.params.id],(err,rows)=>{
             if(err) return res.send('2')
 
-            jwt.verify(req.token,'clavesecreta',(err,authData)=>{
+            jwt.verify(req.token,process.env.CLAVE_TOKEN,(err,authData)=>{
                 if(err) return res.send("2")
 
                 res.json({
@@ -69,7 +71,7 @@ routes.get('/getidpersona/:id',verificaToken,(req,res)=>{
         conn.query('select * from padron where idpersona = ? order by afiliacion asc',[req.params.id],(err,rows)=>{
             if(err) return res.send('2')
 
-            jwt.verify(req.token,'clavesecreta',(err,authData)=>{
+            jwt.verify(req.token,process.env.CLAVE_TOKEN,(err,authData)=>{
                 if(err) return res.send("2")
 
                 res.json({
@@ -94,7 +96,7 @@ routes.post('/add/',verificaToken,(req,res)=>{
                 conn.query('insert into padron set ?',[req.body],(err,rows)=>{
                     if(err) return res.send('1')
         
-                    jwt.verify(req.token,'clavesecreta',(err,authData)=>{
+                    jwt.verify(req.token,process.env.CLAVE_TOKEN,(err,authData)=>{
                         if(err) return res.send("2")
         
                         res.json({
@@ -122,7 +124,7 @@ routes.delete('/del/:id',verificaToken,(req,res)=>{
                 conn.query(`update padron set estado = 'IN' where idpadron= ?`,[req.params.id],(err,rows)=>{
                     if(err) return res.send('2')
 
-                  jwt.verify(req.token,'clavesecreta',(err,authData)=>{
+                  jwt.verify(req.token,process.env.CLAVE_TOKEN,(err,authData)=>{
                 if(err) return res.send("2")
 
                 res.json({
@@ -152,7 +154,7 @@ routes.put('/upd/:id',verificaToken,(req,res)=>{
                 conn.query('update padron set ? where idpadron = ?',[req.body,req.params.id],(err,rows)=>{
                     if(err) return res.send(err)
         
-                    jwt.verify(req.token,'clavesecreta',(err,authData)=>{
+                    jwt.verify(req.token,process.env.CLAVE_TOKEN,(err,authData)=>{
                         if(err) return res.send("2")
         
                         res.json({

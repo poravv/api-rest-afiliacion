@@ -1,92 +1,115 @@
 
 const express = require('express');
 const jwt = require("jsonwebtoken");
+const dotenv = require('dotenv');
+dotenv.config({ path: '../.env'});
 const routes = express.Router();
 
 
 routes.post('/login', (req,res)=>{
     const {usuario,password}=req.body;
     
-    req.getConnection((err,conn)=>{
-        if(err) return res.send("2")
-
-        conn.query('select * from usuario where usuario = ? and contrasenha = ?',[usuario,password],(err,rows)=>{
+    try{
+        req.getConnection((err,conn)=>{
             if(err) return res.send("2")
-
-            jwt.sign({rows},'clavesecreta'
-            //,{expiresIn : '1000s'}//Para personalizar el tiempo para expirar
-            ,(err,token)=>{
-                res.json({
-                    token,
-                    body:rows
+    
+            conn.query('select * from usuario where usuario = ? and contrasenha = ?',[usuario,password],(err,rows)=>{
+                if(err) return res.send("2")
+    
+                jwt.sign({rows},process.env.CLAVE_TOKEN
+                //,{expiresIn : '24'}//Para personalizar el tiempo para expirar
+                ,{expiresIn: '24h'} // expires in 24 hours
+                ,(err,token)=>{
+                    res.json({
+                        token,
+                        body:rows
+                    });
                 });
-            });
-            //res.json(rows);
+                //res.json(rows);
+            })
         })
-    })
+    }catch(e){
+        return res.send("2")
+    }
 })
 
 routes.get('/get/',verificaToken,(req,res)=>{
-    
-    req.getConnection((err,conn)=>{
-        if(err) return res.send("2")
 
-        conn.query('select * from usuario',(err,rows)=>{
+    try{
+        req.getConnection((err,conn)=>{
             if(err) return res.send("2")
-            
-            jwt.verify(req.token,'clavesecreta',(err,authData)=>{
+    
+            conn.query('select * from usuario',(err,rows)=>{
                 if(err) return res.send("2")
-
-                res.json({
-                    mensaje:"Get creado",
-                    authData:authData,
-                    body:rows
+                
+                jwt.verify(req.token,process.env.CLAVE_TOKEN,(err,authData)=>{
+                    if(err) return res.send("2")
+    
+                    res.json({
+                        mensaje:"Get creado",
+                        authData:authData,
+                        body:rows
+                    })
                 })
+    
+                //res.json(rows);
             })
-
-            //res.json(rows);
         })
-    })
+    }catch(e){
+        return res.send("2")
+    }
+    
 })
 
 routes.get('/get/:estado',verificaToken,(req,res)=>{
-    req.getConnection((err,conn)=>{
-        if(err) return res.send("2")
 
-        conn.query('select * from usuario where estado = ?',[req.params.estado],(err,rows)=>{
+    try{
+        req.getConnection((err,conn)=>{
             if(err) return res.send("2")
-
-            jwt.verify(req.token,'clavesecreta',(err,authData)=>{
+    
+            conn.query('select * from usuario where estado = ?',[req.params.estado],(err,rows)=>{
                 if(err) return res.send("2")
-
-                res.json({
-                    mensaje:"Get creado",
-                    authData:authData,
-                    body:rows
+    
+                jwt.verify(req.token,process.env.CLAVE_TOKEN,(err,authData)=>{
+                    if(err) return res.send("2")
+    
+                    res.json({
+                        mensaje:"Get creado",
+                        authData:authData,
+                        body:rows
+                    })
                 })
             })
         })
-    })
+    }catch(e){
+        return res.send("2")
+    }
+    
 })
 
 routes.get('/getid/:id',verificaToken,(req,res)=>{
-    req.getConnection((err,conn)=>{
-        if(err) return res.send("2")
-
-        conn.query('select * from usuario where idusuario = ?',[req.params.id],(err,rows)=>{
+    try{
+        req.getConnection((err,conn)=>{
             if(err) return res.send("2")
-
-            jwt.verify(req.token,'clavesecreta',(err,authData)=>{
+    
+            conn.query('select * from usuario where idusuario = ?',[req.params.id],(err,rows)=>{
                 if(err) return res.send("2")
-
-                res.json({
-                    mensaje:"Get creado",
-                    authData:authData,
-                    body:rows
+    
+                jwt.verify(req.token,process.env.CLAVE_TOKEN,(err,authData)=>{
+                    if(err) return res.send("2")
+    
+                    res.json({
+                        mensaje:"Get creado",
+                        authData:authData,
+                        body:rows
+                    })
                 })
             })
         })
-    })
+    }catch(e){
+        return res.send("2")
+    }
+    
 })
 
 routes.get('/getpersona/:id',verificaToken,(req,res)=>{
@@ -97,7 +120,7 @@ routes.get('/getpersona/:id',verificaToken,(req,res)=>{
         conn.query('select * from usuario where idpersona = ?',[req.params.id],(err,rows)=>{
             if(err) return res.send("2")
 
-            jwt.verify(req.token,'clavesecreta',(err,authData)=>{
+            jwt.verify(req.token,process.env.CLAVE_TOKEN,(err,authData)=>{
                 if(err) return res.send("2")
 
                 res.json({
@@ -118,7 +141,7 @@ routes.get('/getuserasociados/',verificaToken,(req,res)=>{
         conn.query(`select * from vw_usuario_afiliado a where a.nivel = '3' `,(err,rows)=>{
             if(err) return res.send("2")
 
-            jwt.verify(req.token,'clavesecreta',(err,authData)=>{
+            jwt.verify(req.token,process.env.CLAVE_TOKEN,(err,authData)=>{
                 if(err) return res.send("2")
 
                 res.json({
@@ -139,7 +162,7 @@ routes.get('/getuserasociados/:estado-:idusuarioroot',verificaToken,(req,res)=>{
         conn.query(`select * from vw_usuario_afiliado a where a.nivel = '3' and a.idusuarioroot = ? and a.estado= ?`,[req.params.idusuarioroot,req.params.estado],(err,rows)=>{
             if(err) return res.send("2")
 
-            jwt.verify(req.token,'clavesecreta',(err,authData)=>{
+            jwt.verify(req.token,process.env.CLAVE_TOKEN,(err,authData)=>{
                 if(err) return res.send("2")
 
                 res.json({
@@ -160,7 +183,7 @@ routes.get('/getuserasociados/:estado-:anho-:idusuarioroot',verificaToken,(req,r
         conn.query(`select * from vw_usuario_afiliado a where a.nivel = '3' and a.idusuarioroot = ? and a.estado= ? and exists (select  1 from anho_vigente b where b.anho = ?)`,[req.params.idusuarioroot,req.params.estado,req.params.anho],(err,rows)=>{
             if(err) return res.send("2")
 
-            jwt.verify(req.token,'clavesecreta',(err,authData)=>{
+            jwt.verify(req.token,process.env.CLAVE_TOKEN,(err,authData)=>{
                 if(err) return res.send("2")
 
                 res.json({
@@ -181,7 +204,7 @@ routes.get('/getuseradmin/:estado-:idusuarioroot',verificaToken,(req,res)=>{
         conn.query(`select * from vw_usuario_afiliado a where a.nivel = '2' and a.idusuarioroot = ? and a.estado= ?`,[req.params.idusuarioroot,req.params.estado],(err,rows)=>{
             if(err) return res.send("2")
 
-            jwt.verify(req.token,'clavesecreta',(err,authData)=>{
+            jwt.verify(req.token,process.env.CLAVE_TOKEN,(err,authData)=>{
                 if(err) return res.send("2")
 
                 res.json({
@@ -202,7 +225,7 @@ routes.get('/getuseradmin/',verificaToken,(req,res)=>{
         conn.query(`select * from vw_usuario_afiliado a where a.nivel = '2' `,(err,rows)=>{
             if(err) return res.send("2")
 
-            jwt.verify(req.token,'clavesecreta',(err,authData)=>{
+            jwt.verify(req.token,process.env.CLAVE_TOKEN,(err,authData)=>{
                 if(err) return res.send("2")
 
                 res.json({
@@ -223,7 +246,7 @@ routes.get('/getuseradmin/:estado-:anho-:idusuarioroot',verificaToken,(req,res)=
         conn.query(`select * from vw_usuario_afiliado a where a.nivel = '2' and a.idusuarioroot = ? and a.estado= ? and exists (select  1 from anho_vigente b where b.anho = ?)`,[req.params.idusuarioroot,req.params.estado,req.params.anho],(err,rows)=>{
             if(err) return res.send("2")
 
-            jwt.verify(req.token,'clavesecreta',(err,authData)=>{
+            jwt.verify(req.token,process.env.CLAVE_TOKEN,(err,authData)=>{
                 if(err) return res.send("2")
 
                 res.json({
@@ -248,7 +271,7 @@ routes.post('/add/',verificaToken,(req,res)=>{
                 conn.query('insert into usuario set ?',[req.body],(err,rows)=>{
                     if(err) return res.send("2")
         
-                    jwt.verify(req.token,'clavesecreta',(err,authData)=>{
+                    jwt.verify(req.token,process.env.CLAVE_TOKEN,(err,authData)=>{
                         if(err) return res.send("2")
         
                         res.json({
@@ -277,7 +300,7 @@ routes.delete('/del/:id',verificaToken,(req,res)=>{
                 conn.query(`update usuario set usuario = concat(usuario,now()),  estado=concat('I',now()) where idusuario = ?`,[req.params.id],(err,rows)=>{
                     if(err) return res.send(err)
         
-                    jwt.verify(req.token,'clavesecreta',(err,authData)=>{
+                    jwt.verify(req.token,process.env.CLAVE_TOKEN,(err,authData)=>{
                         if(err) return res.send("2")
         
                         res.json({
@@ -312,7 +335,7 @@ routes.put('/upd/:id',verificaToken,(req,res)=>{
                 conn.query('update usuario set ? where idusuario = ?',[req.body,req.params.id],(err,rows)=>{
                     if(err) return res.send(err)
         
-                    jwt.verify(req.token,'clavesecreta',(err,authData)=>{
+                    jwt.verify(req.token,process.env.CLAVE_TOKEN,(err,authData)=>{
                         if(err) return res.send("2")
         
                         res.json({

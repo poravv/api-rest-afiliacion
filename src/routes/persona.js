@@ -1,6 +1,8 @@
 const express = require('express');
 const routes = express.Router();
 const jwt = require("jsonwebtoken");
+const dotenv = require('dotenv');
+dotenv.config({ path: '../.env'});
 
 routes.get('/get/',verificaToken,(req,res)=>{
     req.getConnection((err,conn)=>{
@@ -9,7 +11,7 @@ routes.get('/get/',verificaToken,(req,res)=>{
         conn.query('select * from persona limit 100',(err,rows)=>{
             if(err) return res.send('2')
 
-            jwt.verify(req.token,'clavesecreta',(err,authData)=>{
+            jwt.verify(req.token,process.env.CLAVE_TOKEN,(err,authData)=>{
                 if(err) return res.send("2")
 
                 res.json({
@@ -29,7 +31,7 @@ routes.get('/get/:estado',verificaToken,(req,res)=>{
         conn.query('select * from persona where estado = ? limit 100',[req.params.estado],(err,rows)=>{
             if(err) return res.send('2')
 
-            jwt.verify(req.token,'clavesecreta',(err,authData)=>{
+            jwt.verify(req.token,process.env.CLAVE_TOKEN,(err,authData)=>{
                 if(err) return res.send("2")
 
                 res.json({
@@ -43,34 +45,39 @@ routes.get('/get/:estado',verificaToken,(req,res)=>{
 })
 
 routes.get('/getid/:id',verificaToken,(req,res)=>{
-    req.getConnection((err,conn)=>{
-        if(err) return res.send('2')
-
-        conn.query('select * from persona where idpersona = ? ',[req.params.id],(err,rows)=>{
+    try{
+        req.getConnection((err,conn)=>{
             if(err) return res.send('2')
-
-            jwt.verify(req.token,'clavesecreta',(err,authData)=>{
-                if(err) return res.send("2")
-
-                res.json({
-                    mensaje:"Get creado",
-                    authData:authData,
-                    body:rows
+    
+            conn.query('select * from persona where idpersona = ? ',[req.params.id],(err,rows)=>{
+                if(err) return res.send('2')
+    
+                jwt.verify(req.token,process.env.CLAVE_TOKEN,(err,authData)=>{
+                    if(err) return res.send("2")
+    
+                    res.json({
+                        mensaje:"Get creado",
+                        authData:authData,
+                        body:rows
+                    })
                 })
             })
         })
-    })
+    }catch(e){
+        return res.send('2')
+    }
 })
 
 routes.get('/getdoc/:documento',verificaToken,(req,res)=>{
     
+   try{
     req.getConnection((err,conn)=>{
         if(err) return res.send('2')
         
         conn.query('select * from persona where documento = ?',[req.params.documento],(err,rows)=>{
             if(err) return res.send('2')
 
-            jwt.verify(req.token,'clavesecreta',(err,authData)=>{
+            jwt.verify(req.token,process.env.CLAVE_TOKEN,(err,authData)=>{
                 if(err) return res.send("2")
 
                 res.json({
@@ -82,6 +89,9 @@ routes.get('/getdoc/:documento',verificaToken,(req,res)=>{
         })
         
     })
+   }catch(e){
+    return res.send('2')
+   }
 })
 
 routes.post('/add/',verificaToken,(req,res)=>{
@@ -95,7 +105,7 @@ routes.post('/add/',verificaToken,(req,res)=>{
                 conn.query('insert into persona set ?',[req.body],(err,rows)=>{
                     if(err) return res.send(err)
         
-                    jwt.verify(req.token,'clavesecreta',(err,authData)=>{
+                    jwt.verify(req.token,process.env.CLAVE_TOKEN,(err,authData)=>{
                         if(err) return res.send("2")
         
                         res.json({
@@ -123,7 +133,7 @@ routes.delete('/del/:id',verificaToken,(req,res)=>{
                 conn.query(`update persona set estado='AC' where idpersona = ?`,[req.params.id],(err,rows)=>{
                     if(err) return res.send('1')
         
-                    jwt.verify(req.token,'clavesecreta',(err,authData)=>{
+                    jwt.verify(req.token,process.env.CLAVE_TOKEN,(err,authData)=>{
                         if(err) return res.send("2")
         
                         res.json({
@@ -158,7 +168,7 @@ routes.put('/upd/:id',verificaToken,(req,res)=>{
                 conn.query('update persona set ? where idpersona = ?',[req.body,req.params.id],(err,rows)=>{
                     if(err) return res.send('2')
         
-                    jwt.verify(req.token,'clavesecreta',(err,authData)=>{
+                    jwt.verify(req.token,process.env.CLAVE_TOKEN,(err,authData)=>{
                         if(err) return res.send("2")
         
                         res.json({

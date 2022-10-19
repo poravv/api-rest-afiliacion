@@ -1,6 +1,8 @@
 const express = require('express');
 const routes = express.Router();
 const jwt = require("jsonwebtoken");
+const dotenv = require('dotenv');
+dotenv.config({ path: '../.env'});
 
 routes.get('/get/',verificaToken, (req, res) => {
     
@@ -10,7 +12,7 @@ routes.get('/get/',verificaToken, (req, res) => {
         conn.query('select * from departamento order by descripcion asc',(err,rows)=>{
             if(err) return res.send('2')
 
-            jwt.verify(req.token,'clavesecreta',(err,authData)=>{
+            jwt.verify(req.token,process.env.CLAVE_TOKEN,(err,authData)=>{
                 if(err) return res.send("2")
 
                 res.json({
@@ -31,7 +33,7 @@ routes.get('/get/:estado',verificaToken, (req, res) => {
         conn.query('select * from departamento where estado = ? order by descripcion asc',[req.params.estado],(err,rows)=>{
             if(err) return res.send('2')
 
-            jwt.verify(req.token,'clavesecreta',(err,authData)=>{
+            jwt.verify(req.token,process.env.CLAVE_TOKEN,(err,authData)=>{
                 if(err) return res.send("2")
 
                 res.json({
@@ -55,7 +57,7 @@ routes.get('/getid/:id',verificaToken, (req, res) => {
             if (err) return res.send("2")
 
             
-            jwt.verify(req.token,'clavesecreta',(err,authData)=>{
+            jwt.verify(req.token,process.env.CLAVE_TOKEN,(err,authData)=>{
                 if(err) return res.send("2")
 
                 res.json({
@@ -80,7 +82,7 @@ routes.post('/add/',verificaToken, (req, res) => {
                 conn.query('insert into departamento set ?', [req.body], (err, rows) => {
                     if (err) return res.send(err)
 
-                    jwt.verify(req.token,'clavesecreta',(err,authData)=>{
+                    jwt.verify(req.token,process.env.CLAVE_TOKEN,(err,authData)=>{
                         if(err) return res.send("2")
         
                         res.json({
@@ -106,7 +108,7 @@ routes.delete('/del/:id',verificaToken, (req, res) => {
                 conn.query(`update departamento set estado='IN' where iddepartamento = ?`, [req.params.id], (err, rows) => {
                     if (err) return res.send(err)
 
-                    jwt.verify(req.token,'clavesecreta',(err,authData)=>{
+                    jwt.verify(req.token,process.env.CLAVE_TOKEN,(err,authData)=>{
                         if(err) return res.send("2")
                         
                         res.json({
@@ -148,7 +150,7 @@ routes.put('/upd/:id',verificaToken, (req, res) => {
                 conn.query('update departamento set ? where iddepartamento = ?', [req.body, req.params.id], (err, rows) => {
                     if (err) return res.send(err)
                     
-                    jwt.verify(req.token,'clavesecreta',(err,authData)=>{
+                    jwt.verify(req.token,process.env.CLAVE_TOKEN,(err,authData)=>{
                         if(err) return res.send("2")
                         
                         res.json({

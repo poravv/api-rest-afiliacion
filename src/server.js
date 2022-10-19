@@ -5,7 +5,7 @@ const myconn = require('express-myconnection')
 const dotenv = require('dotenv');
 const configrutas =  require('./config_rutas')
 dotenv.config({ path: './.env'});
-const port = process.env.PORT||4001;
+const port = process.env.PORT||4002;
 
 const dbOptions = {
     host:process.env.DB_HOST,
@@ -25,7 +25,7 @@ app.use(configrutas)
 
 //Rutas --------------------------------
 app.get('/',(req,res)=>{
-    res.send('Bienvenido a mi APP')
+    res.send('Api rest Afiliacion')
 })
 
 //Server Running ----------------------

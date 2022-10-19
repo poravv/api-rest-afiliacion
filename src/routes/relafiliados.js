@@ -1,6 +1,8 @@
 const express = require('express');
 const routes = express.Router();
 const jwt = require("jsonwebtoken");
+const dotenv = require('dotenv');
+dotenv.config({ path: '../.env'});
 
 routes.get('/get/',verificaToken,(req,res)=>{
     req.getConnection((err,conn)=>{
@@ -9,7 +11,7 @@ routes.get('/get/',verificaToken,(req,res)=>{
         conn.query('select * from rel_afiliados',(err,rows)=>{
             if(err) return res.send('2')
 
-            jwt.verify(req.token,'clavesecreta',(err,authData)=>{
+            jwt.verify(req.token,process.env.CLAVE_TOKEN,(err,authData)=>{
                 if(err) return res.send("2")
 
                 res.json({
@@ -29,7 +31,7 @@ routes.get('/get/:estado',verificaToken,(req,res)=>{
         conn.query('select * from rel_afiliados where estado = ?',[req.params.estado],(err,rows)=>{
             if(err) return res.send('2')
 
-            jwt.verify(req.token,'clavesecreta',(err,authData)=>{
+            jwt.verify(req.token,process.env.CLAVE_TOKEN,(err,authData)=>{
                 if(err) return res.send("2")
 
                 res.json({
@@ -49,7 +51,7 @@ routes.get('/getidraf/:idvigencia',verificaToken,(req,res)=>{
         conn.query('select * from rel_afiliados where idanho_vigente = ?',[req.params.idvigencia],(err,rows)=>{
             if(err) return res.send('2')
 
-            jwt.verify(req.token,'clavesecreta',(err,authData)=>{
+            jwt.verify(req.token,process.env.CLAVE_TOKEN,(err,authData)=>{
                 if(err) return res.send("2")
 
                 res.json({
@@ -69,7 +71,7 @@ routes.get('/getpersona/:id',verificaToken,(req,res)=>{
         conn.query('select * from vw_afiliados where idpersona = ?',[req.params.id],(err,rows)=>{
             if(err) return res.send('2')
 
-            jwt.verify(req.token,'clavesecreta',(err,authData)=>{
+            jwt.verify(req.token,process.env.CLAVE_TOKEN,(err,authData)=>{
                 if(err) return res.send("2")
 
                 res.json({
@@ -89,7 +91,7 @@ routes.get('/getusuario/:id',verificaToken,(req,res)=>{
         conn.query(`select * from vw_afiliados where estado = 'AC' and idusuario = ?`,[req.params.id],(err,rows)=>{
             if(err) return res.send('2')
 
-            jwt.verify(req.token,'clavesecreta',(err,authData)=>{
+            jwt.verify(req.token,process.env.CLAVE_TOKEN,(err,authData)=>{
                 if(err) return res.send("2")
 
                 res.json({
@@ -113,7 +115,7 @@ routes.post('/add/',verificaToken,(req,res)=>{
                 conn.query('insert into rel_afiliados set ?',[req.body],(err,rows)=>{
                     if(err) return res.send(err)
         
-                    jwt.verify(req.token,'clavesecreta',(err,authData)=>{
+                    jwt.verify(req.token,process.env.CLAVE_TOKEN,(err,authData)=>{
                         if(err) return res.send("2")
         
                         res.json({
@@ -141,7 +143,7 @@ routes.delete('/del/:idpersona-:idanho_vigente',verificaToken,(req,res)=>{
                 conn.query(`update rel_afiliados set estado=concat('I',now()) where idpersona= ? and idanho_vigente = ? and estado = 'AC'`,[req.params.idpersona,req.params.idanho_vigente],(err,rows)=>{
                     if(err) return res.send(err)
         
-                    jwt.verify(req.token,'clavesecreta',(err,authData)=>{
+                    jwt.verify(req.token,process.env.CLAVE_TOKEN,(err,authData)=>{
                         if(err) return res.send("2")
         
                         res.json({
@@ -176,7 +178,7 @@ routes.put('/upd/:idpersona-:idanho_vigente',verificaToken,(req,res)=>{
                 conn.query('update rel_afiliados set ? where idpersona = ? and idanho_vigente = ?',[req.body,req.params.idpersona,req.params.idanho_vigente],(err,rows)=>{
                     if(err) return res.send(err)
         
-                    jwt.verify(req.token,'clavesecreta',(err,authData)=>{
+                    jwt.verify(req.token,process.env.CLAVE_TOKEN,(err,authData)=>{
                         if(err) return res.send("2")
         
                         res.json({

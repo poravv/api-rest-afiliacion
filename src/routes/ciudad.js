@@ -1,6 +1,8 @@
 const express = require('express');
 const routes = express.Router();
 const jwt = require("jsonwebtoken");
+const dotenv = require('dotenv');
+dotenv.config({ path: '../.env'});
 
 routes.get('/get/',verificaToken,(req,res)=>{
     req.getConnection((err,conn)=>{
@@ -9,12 +11,12 @@ routes.get('/get/',verificaToken,(req,res)=>{
         conn.query('select * from ciudad order by descripcion asc',(err,rows)=>{
             if(err) return res.send('2')
 
-            jwt.verify(req.token,'clavesecreta',(err,authData)=>{
+            jwt.verify(req.token,process.env.CLAVE_TOKEN,(err,authData)=>{
                 if(err) return res.send("2")
 
                 res.json({
                     mensaje:"Get creado",
-                    authData:authData,
+                    authData:authDaSta,
                     body:rows
                 })
             })
@@ -29,7 +31,7 @@ routes.get('/get/:estado',verificaToken, (req, res) => {
         conn.query('select * from ciudad where estado = ? order by descripcion asc',[req.params.estado],(err,rows)=>{
             if(err) return res.send('2')
 
-            jwt.verify(req.token,'clavesecreta',(err,authData)=>{
+            jwt.verify(req.token,process.env.CLAVE_TOKEN,(err,authData)=>{
                 if(err) return res.send("2")
 
                 res.json({
@@ -49,7 +51,7 @@ routes.get('/getid/:id',verificaToken, (req, res) => {
         conn.query('select * from ciudad where idciudad = ?', [req.params.id], (err, rows) => {
             if (err) return res.send(err)
 
-            jwt.verify(req.token,'clavesecreta',(err,authData)=>{
+            jwt.verify(req.token,process.env.CLAVE_TOKEN,(err,authData)=>{
                 if(err) return res.send("2")
 
                 res.json({
@@ -74,7 +76,7 @@ routes.post('/add/',verificaToken, (req, res) => {
                 conn.query('insert into ciudad set ?', [req.body], (err, rows) => {
                     if (err) return res.send('2')
 
-                    jwt.verify(req.token,'clavesecreta',(err,authData)=>{
+                    jwt.verify(req.token,process.env.CLAVE_TOKEN,(err,authData)=>{
                         if(err) return res.send("2")
         
                         res.json({
@@ -102,7 +104,7 @@ routes.delete('/del/:id',verificaToken, (req, res) => {
                 conn.query(`update ciudad set estado='IN' where idciudad = ?`, [req.params.id], (err, rows) => {
                     if (err) return res.send('2')
 
-                    jwt.verify(req.token,'clavesecreta',(err,authData)=>{
+                    jwt.verify(req.token,process.env.CLAVE_TOKEN,(err,authData)=>{
                         if(err) return res.send("2")
         
                         res.json({
@@ -144,7 +146,7 @@ routes.put('/upd/:id', verificaToken, (req, res) => {
                 conn.query('update ciudad set ? where idciudad = ?', [req.body, req.params.id], (err, rows) => {
                     if (err) return res.send('2')
 
-                    jwt.verify(req.token,'clavesecreta',(err,authData)=>{
+                    jwt.verify(req.token,process.env.CLAVE_TOKEN,(err,authData)=>{
                         if(err) return res.send("2")
         
                         res.json({
