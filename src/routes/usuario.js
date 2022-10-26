@@ -28,8 +28,8 @@ routes.post('/login', (req,res)=>{
                 //res.json(rows);
             })
         })
-    }catch(e){
-        return res.send("2")
+    }catch(error){
+        return res.send('2');
     }
 })
 
@@ -55,8 +55,8 @@ routes.get('/get/',verificaToken,(req,res)=>{
                 //res.json(rows);
             })
         })
-    }catch(e){
-        return res.send("2")
+    }catch(error){
+        return res.send('2');
     }
     
 })
@@ -81,8 +81,8 @@ routes.get('/get/:estado',verificaToken,(req,res)=>{
                 })
             })
         })
-    }catch(e){
-        return res.send("2")
+    }catch(error){
+        return res.send('2');
     }
     
 })
@@ -106,14 +106,15 @@ routes.get('/getid/:id',verificaToken,(req,res)=>{
                 })
             })
         })
-    }catch(e){
-        return res.send("2")
+    }catch(error){
+        return res.send('2');
     }
     
 })
 
 routes.get('/getpersona/:id',verificaToken,(req,res)=>{
-    //res.send('test de api')
+    try {
+        //res.send('test de api')
     req.getConnection((err,conn)=>{
         if(err) return res.send("2")
 
@@ -131,11 +132,15 @@ routes.get('/getpersona/:id',verificaToken,(req,res)=>{
             })
         })
     })
+    } catch (error) {
+        return res.send('2');
+    }
 })
 
 routes.get('/getuserasociados/',verificaToken,(req,res)=>{
-    //res.send('test de api')
-    req.getConnection((err,conn)=>{
+   try {
+     //res.send('test de api')
+     req.getConnection((err,conn)=>{
         if(err) return res.send("2")
 
         conn.query(`select * from vw_usuario_afiliado a where a.nivel = '3' `,(err,rows)=>{
@@ -152,10 +157,14 @@ routes.get('/getuserasociados/',verificaToken,(req,res)=>{
             })
         })
     })
+   } catch (error) {
+    return res.send('2');
+   }
 })
 
 routes.get('/getuserasociados/:estado-:idusuarioroot',verificaToken,(req,res)=>{
-    //res.send('test de api')
+    try {
+        //res.send('test de api')
     req.getConnection((err,conn)=>{
         if(err) return res.send("2")
 
@@ -173,11 +182,15 @@ routes.get('/getuserasociados/:estado-:idusuarioroot',verificaToken,(req,res)=>{
             })
         })
     })
+    } catch (error) {
+        return res.send('2');
+    }
 })
 
 routes.get('/getuserasociados/:estado-:anho-:idusuarioroot',verificaToken,(req,res)=>{
-    //res.send('test de api')
-    req.getConnection((err,conn)=>{
+   try {
+     //res.send('test de api')
+     req.getConnection((err,conn)=>{
         if(err) return res.send("2")
 
         conn.query(`select * from vw_usuario_afiliado a where a.nivel = '3' and a.idusuarioroot = ? and a.estado= ? and exists (select  1 from anho_vigente b where b.anho = ?)`,[req.params.idusuarioroot,req.params.estado,req.params.anho],(err,rows)=>{
@@ -194,10 +207,14 @@ routes.get('/getuserasociados/:estado-:anho-:idusuarioroot',verificaToken,(req,r
             })
         })
     })
+   } catch (error) {
+    return res.send('2');
+   }
 })
 
 routes.get('/getuseradmin/:estado-:idusuarioroot',verificaToken,(req,res)=>{
-    //res.send('test de api')
+    try {
+        //res.send('test de api')
     req.getConnection((err,conn)=>{
         if(err) return res.send("2")
 
@@ -215,10 +232,14 @@ routes.get('/getuseradmin/:estado-:idusuarioroot',verificaToken,(req,res)=>{
             })
         })
     })
+    } catch (error) {
+        return res.send('2');
+    }
 })
 
 routes.get('/getuseradmin/',verificaToken,(req,res)=>{
-    //res.send('test de api')
+    try {
+        //res.send('test de api')
     req.getConnection((err,conn)=>{
         if(err) return res.send("2")
 
@@ -236,10 +257,14 @@ routes.get('/getuseradmin/',verificaToken,(req,res)=>{
             })
         })
     })
+    } catch (error) {
+        return res.send('2');
+    }
 })
 
 routes.get('/getuseradmin/:estado-:anho-:idusuarioroot',verificaToken,(req,res)=>{
-    //res.send('test de api')
+    try {
+        //res.send('test de api')
     req.getConnection((err,conn)=>{
         if(err) return res.send("2")
 
@@ -257,6 +282,9 @@ routes.get('/getuseradmin/:estado-:anho-:idusuarioroot',verificaToken,(req,res)=
             })
         })
     })
+    } catch (error) {
+        return res.send('2');
+    }
 })
 
 routes.post('/add/',verificaToken,(req,res)=>{
