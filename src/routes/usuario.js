@@ -7,6 +7,7 @@ const routes = express.Router();
 
 
 routes.post('/login', (req,res)=>{
+    console.log('Entra en el login..')
     const {usuario,password}=req.body;
     
     try{

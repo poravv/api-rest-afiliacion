@@ -120,8 +120,7 @@ routes.get('/getusuario/:id', verificaToken, (req, res) => {
             })
         });
     } catch (error) {
-        //throw error;
-        return res.send('2');
+        res.send('2');
     }
 })
 

@@ -1,26 +1,34 @@
 const express = require('express');
 const app = express()
-const mysql = require('mysql')
-const myconn = require('express-myconnection')
 const dotenv = require('dotenv');
 const configrutas =  require('./config_rutas')
 dotenv.config({ path: './.env'});
 const cors = require('cors');
 const port = process.env.PORT||4002;
 
-const dbOptions = {
-    host:process.env.DB_HOST,
-    port:process.env.DB_PORT,
-    user:process.env.DB_USER,
-    password:process.env.DB_PASSWORD,
-    database:process.env.DB_DATABASE
-}
+    const mysql = require('mysql'),
+    connection  = require('express-myconnection'),
+    dbOptions = {
+        host:process.env.DB_HOST,
+        port:process.env.DB_PORT,
+        user:process.env.DB_USER,
+        password:process.env.DB_PASSWORD,
+        database:process.env.DB_DATABASE
+    };
 
+
+ 
 //Middelware---
 app.use(cors());/*aplica permiso para todos los origenes*/
 app.use(express.urlencoded({extended : false}))
 app.use(express.json())
-app.use(myconn(mysql,dbOptions,'single'))
+//Definir siempre antes de las configrutas
+try {
+    app.use(connection(mysql, dbOptions, 'single'));
+} catch (error) {
+    console.log('Error de conexion')
+}
+
 app.use(configrutas)
 
 
